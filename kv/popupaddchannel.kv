@@ -1,0 +1,69 @@
+#:import getTexture2 commons.getTexture2
+<popupaddchannel>:
+    size_hint:(None, None)
+    size: (600,350)
+    title:"Adicionar Canal"
+    BoxLayout:
+        orientation:'horizontal'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos:self.pos
+                size:self.size
+            Color:
+                rgba: .9, .9, .9, 1
+            Rectangle:
+                pos:self.pos
+                size:self.size
+                texture:getTexture2(self,[10, 120, 255, 100],[255, 255, 255, 55],"v")
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: "Selecione um icone para o canal"
+                size_hint:(None,None)
+                size:(150,25)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
+            GridLayout:
+                id:grid_images_add_channel
+                cols:4
+                #rows:4
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: .5,.8
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            padding:0,10,0,0
+            GridLayout:
+                cols:2
+                spacing:10,30
+                size_hint:(0.5,.7)
+                Label:
+                    text:'Nome'
+                    size_hint:(None,None)
+                    size:(40,40)
+                TextInput:
+                    id:name_new_channel
+                    size_hint:(None,None)
+                    size:(130,30)
+
+                Label:
+                    text:'Tipo'
+                    size_hint:(None,None)
+                    size:(40,40)
+                Spinner:
+                    id: type_new_channel
+                    size_hint:(None,None)
+                    background_normal:"''"
+                    size:(130,30)
+                    values:["Piezo","Switch","HHC"]
+                    text: self.values[0]
+            Label:
+                size_hint:(None,None)
+                size:(130,50)
+            ImageButton:
+                on_press: root.validate_and_save_channel()
+                source:"resources/icons/icons_save.png"
+                size_hint:(None,None)
+                size:(50,50)
+                pos_hint: {'center_x': .8, 'center_y': .2}

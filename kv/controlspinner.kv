@@ -1,0 +1,24 @@
+<controlspinner>:
+    orientation:"horizontal"
+    Label:
+        id:label
+        text:"title"
+        color:(1,1,1,1)
+        size_hint: (None, None)
+        size:(90,25)
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        canvas.before:
+            Color:
+                rgba:.1,.1,.1,.8
+            Rectangle:
+                size:self.size
+                pos:self.pos
+    Spinner:
+        id:spinner
+        values:[]
+        on_text: root.on_modify(self.text)
+        background_normal:"''"
+        color:(0,0,0,1)
+        size_hint: (None, None)
+        size:(150,25)
+        pos_hint: {'center_x': .5, 'center_y': .5}

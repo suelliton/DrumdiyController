@@ -1,0 +1,211 @@
+##:import BoxForGrid DrumdiyController.BoxForGrid
+##:import MainWindow DrumdiyController.MainWindow
+#:import getTexture2 commons.getTexture2
+
+<mainwindow>
+    orientation:'vertical'
+
+    canvas:
+        Color:
+            #rgba: .9, .9, .9, 1
+            rgba: .7, .7, 1, 1
+        Rectangle:
+            pos:self.pos
+            size:self.size
+            #texture:BoxForGrid.getTexture(self,[200, 200, 255, 255],[255, 255, 255, 200],"v")
+
+
+    BoxLayout:
+        id: box_settings
+        orientation: 'horizontal'
+        size_hint: 1,.08
+        pos_hint: {'center_x': .5, 'center_y': .5}
+
+        padding:0,0,20,0
+        ImageButton:
+            on_press: root.On(self)
+            source:"resources/icons/icons_toggle_on.png" if root.active else "resources/icons/icons_toggle_off.png"
+            id:activate
+            size_hint: (None,None)
+            width:120
+            height:60
+            pos_hint: {'center_x': .5, 'center_y': .5}
+
+        Label:
+            size_hint: (.2,None)
+            height:30
+            pos_hint: {'center_x': .5, 'center_y': .5}
+
+        Label:
+            size_hint_x:.05
+            width:60
+            text:"Serial"
+
+        Spinner:
+            id:spinner_serial
+            values: root.serial_ports
+            text: self.values[0] if len(root.serial_ports) >0 else ""
+            on_press:root.load_serial_spinner()
+            #background_color:(1, .1, .1,1)
+            background_normal:"''"
+            color:(0,0,0,1)
+            size_hint: (.05, None)
+            size:(100,25)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+        Label:
+            size_hint_x:None
+            width:30
+            text:""
+        Label:
+            size_hint_x:.05
+            width:60
+            text:"MIDI"
+        Spinner:
+            id:spinner_midi
+            values:root.midi_ports
+            text:self.values[len(root.midi_ports)-1] if len(root.midi_ports) > 0 else  ""
+            on_press: root.make_thread(root.load_midi_spinner())
+            on_release: root.make_thread(root.enable_midi(self.text))
+            #background_color:(1, .1, .1,1)
+            background_normal:"''"
+            color:(0,0,0,1)
+            size_hint: (.1, None)
+            size:(210,25)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+
+    BoxLayout:
+        id:container_grid_channels
+        orientation:'horizontal'
+        size_hint: 0.98,.85
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        padding:10
+        spacing: 10
+        BoxLayout:#Box menu de botoes
+            orientation:"vertical"
+            size_hint_x:.05
+            padding:5,20,5,5
+            canvas:
+                Color:
+                    rgba: (.2,.2,.2,1)#preto
+                Line:
+                    width:1
+                    rectangle:self.x, self.y, self.width, self.height
+
+            ImageButton: #button add
+                on_press:root.show_popup_add_channel()
+                source:"resources/icons/icons_add.png"
+                size_hint_y:.1
+            ImageButton:#button remove
+                on_press:root.dialog_remove_channel()
+                size_hint_y:.1
+                source:"resources/icons/icons_trash.png"
+            ImageButton:
+                source:"resources/icons/icons_mute.png"
+                on_press: root.make_thread(root.silent_all_channels())
+                color:(1,1,1,1)
+                background_color: (.2, .2, .2,0) if self.state == 'normal' else (.1,.45,1,1)#tive que fazer uma compensação pois as cores se soman #azul bonito (.1,.45,1,1)
+                size_hint_y:.1
+            ToggleButton:
+                canvas:
+                    Rectangle:
+                        source:"resources/icons/icons_bar.png"
+                        pos:self.pos
+                        size:self.size
+                on_press: root.monitor = not root.monitor
+                #text:"VEL"
+                #color:(1,1,1,1)
+                size_hint:(1,.1)
+                background_color: (.2, .2, .2,0) if self.state == 'normal' else (.1,.45,1,1)
+
+
+            ToggleButton:
+                canvas:
+                    Rectangle:
+                        source:"resources/icons/icons_combo.png"
+                        pos:self.pos
+                        size:self.size
+                on_press: root.monitor_cc = not root.monitor_cc
+                color:(1,1,1,1)
+                background_color: (.2, .2, .2,0) if self.state == 'normal' else (.1,.45,1,1)#tive que fazer uma compensação pois as cores se soman #azul bonito (.1,.45,1,1)
+                size_hint_y:.1
+
+
+            ImageButton:
+                source:"resources/icons/icons_arduino.png"
+                on_press:root.make_thread(root.sendSketch()), root.thread_progress()
+                color:(1,1,1,1)
+                background_color: (.2, .2, .2,0) if self.state == 'normal' else (.1,.45,1,1)#tive que fazer uma compensação pois as cores se soman #azul bonito (.1,.45,1,1)
+                size_hint_y:.1
+
+
+
+
+
+
+        BoxLayout:
+            id: box_grid_channels
+            orientation:'vertical'
+            size_hint_x:.5
+            padding:2#para descolar o botão de adicionar canal do box de cima
+            canvas:
+                Color:
+                    #rgba: (.69,.83,1,1)#azul
+                    rgba: (0,0,0,.5)#preto
+                Line:
+                    width:1
+                    rectangle:self.x, self.y, self.width, self.height
+
+            BoxLayout:
+                orientation:"horizontal"
+                size_hint: (1,None)
+                #width:40
+                height:25
+                padding:10,0,10,0
+
+
+                Label:
+                    text:"Canais"
+                    bold:True
+                    size_hint:(1,None)
+                    size:(60,35)
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+
+
+            GridLayout:
+                id:grid
+                spacing:10
+                padding:10
+                cols:4
+
+
+
+        #separação centro
+        BoxLayout:
+            size_hint_x:0.45
+            id:container_selected
+
+
+
+
+
+<boxforgrid>:
+    canvas:
+        Color:
+            rgba: 0, 0, 0, .9
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
+        Color:
+            rgba: .9, .9, .9, 1
+        Rectangle:
+            pos:self.pos
+            size:self.size
+            texture:getTexture2(self,[10, 120, 255, 100],[255, 255, 255, 55],"v")
+
+<labelforgrid>:
+    canvas.before:
+        Color:
+            rgba:(.1,.1,.1,.8)
+        Rectangle:
+            pos : self.pos
+            size : self.size
